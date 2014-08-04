@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html class="no-js">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=.5, maximum-scale=1.0, user-scalable=no">
+        <link href='http://fonts.googleapis.com/css?family=VT323' rel='stylesheet' type='text/css'>
+        <!-- Place favicon.ico and apple-touch-icon(s) in the root directory -->
+        <meta name='HandheldFriendly' content='True'>
+        <meta name='MobileOptimized' content='640'>
+
+
+        <link rel="stylesheet" href="css/normalize.css">
+        <link rel="stylesheet" href="css/main.css">
+    <script src="js/icanhaz.min.js"></script>
+        <script src="js/vendor/modernizr-2.7.1.min.js"></script>
+        <script id="menu" type="text/html">
+            <h1>Bear Cleans Up!</h1>
+            <span class='btn' id='continue'>Continue</span>
+            <span class='btn' id='newgame'>New Game</span>
+            <!--span class='btn' id='options'>Options</span-->
+            <style>
+                h1 {
+                    position: absolute;
+                    width: 100%;
+                    text-align: center;
+                    top: 100px;
+                    color: #fff;
+                    font-size: 3em;
+                }
+                #continue {
+                    top: 300px;
+                    display: none;
+                }
+                #newgame {
+                    top: 400px;
+                }
+                #options {
+                    top: 500px;
+                }
+                #inventory {
+                    display: none;
+                }
+            </style>
+            <script>
+
+                bearcleansup.play();
+
+                if(localStorage.game != undefined && localStorage.game.length > 0) {
+                    $('#continue').show();
+                } else {
+                    $('#continue').hide();
+                }
+                $('#newgame').on('click', function(){
+                    letsgo.play();
+                    states = {};
+                    states.speed = 15;
+                    scene('floor');
+                    localStorage.game = '';
+                    return false;
+                });
+                $('#continue').on('click', function(){
+                    load();
+                    return false;
+                });
+            </script>
+        </script>
+        <script id="showinventory" class="partial" type="text/html">
+            <style>
+                #inventory {
+                    display: block;
+                }
+                #inventory [data-tool=car]{
+                    background-image: url(img/car_icon.png);
+                }
+                #inventory [data-tool=fred]{
+                    background-image: url(img/fred_icon.png);
+                }
+                #inventory [data-tool=heywakeup]{
+                    background-image: url(img/heywakeup_icon.png);
+                }
+                #inventory [data-tool=key]{
+                    background-image: url(img/key_icon.png);
+                }
+                #inventory [data-tool=monkey]{
+                    background-image: url(img/monkey_icon.png);
+                }
+                #inventory [data-tool=rhino]{
+                    background-image: url(img/rhino_icon.png);
+                }
+                #inventory [data-tool=tigger]{
+                    background-image: url(img/tigger_icon.png);
+                }
+            </style>
+        </script>
+        <script id="floor" type="text/html">
+            <a id="sprite" class='right'></a>
+            <a id="car" class='item'></a>
+            <a id="fred" class='item'></a>
+            <a id="heywakeup" class='item'></a>
+            <a id="key" class='item'></a>
+            <a id="monkey" class='item'></a>
+            <a id="rhino" class='item'></a>
+            <a id="tigger" class='item'></a>
+            <a id="left"></a>
+            <a id="right"></a>
+            {{>showinventory}}
+            <style>
+                #game {
+                    background: url(img/scenes/floor.jpg) center center;
+                }
+                #car, #fred, #heywakeup, #key, #monkey, #rhino, #tigger {
+                    bottom: 230px;
+                    z-index: 1;
+                }
+                #car{
+                    width: 192px;
+                    height: 95px;
+                    left: 896px;
+                    background-image: url(img/car.png);
+                }
+                #fred{
+                    width: 63px;
+                    height: 82px;
+                    left: 542px;
+                    background-image: url(img/fred.png);
+                }
+                #heywakeup{
+                    width: 75px;
+                    height: 91px;
+                    left: 436px;
+                    background-image: url(img/heywakeup.png);
+                }
+                #key{
+                    width: 66px;
+                    height: 38px;
+                    left: 740px;
+                    background-image: url(img/key.png);
+                }
+                #monkey{
+                    width: 156px;
+                    height: 141px;
+                    left: 269px;
+                    background-image: url(img/monkey.png);
+                }
+                #rhino{
+                    width: 68px;
+                    height: 68px;
+                    left: 650px;
+                    background-image: url(img/rhino.png);
+                }
+                #tigger{
+                    width: 46px;
+                    height: 58px;
+                    left: 826px;
+                    background-image: url(img/tigger.png);
+                }
+                #left, #right {
+                    z-index: 0;
+                }
+                #left {
+                    height: 100%;
+                    left: 0;
+                    width: 150px;
+                }
+                #right {
+                    height: 100%;
+                    right: 0;
+                    width: 150px;
+                }
+                #sprite {
+                    left: 20px;
+                    bottom: 200px;
+                    height: 161px;
+                    width: 180px;
+                    background: url(img/sitting.png?v=1) 0 0;
+                    -webkit-animation: sitting 3s steps(2) infinite;
+                    z-index: 2;
+                }
+                @-webkit-keyframes sitting {
+                   from { background-position:    0 0px; }
+                     to { background-position: 0 -322px; }
+                }
+                #sprite.walking {
+                    background-image: url(img/walking.png);
+                    height: 134px;
+                    -webkit-animation: walking .8s steps(2) infinite;
+                }
+                @-webkit-keyframes walking {
+                   from { background-position:    0 0px; }
+                     to { background-position:  0 -268px; }
+                }
+            </style>
+            <script>
+                //ready the room with any necessary states
+                if(states.car == 'taken') {
+                    $('#car').remove();
+                }
+                if(states.fred == 'taken') {
+                    $('#fred').remove();
+                }
+                if(states.heywakeup == 'taken') {
+                    $('#heywakeup').remove();
+                }
+                if(states.key == 'taken') {
+                    $('#key').remove();
+                }
+                if(states.monkey == 'taken') {
+                    $('#monkey').remove();
+                }
+                if(states.rhino == 'taken') {
+                    $('#rhino').remove();
+                }
+                if(states.tigger == 'taken') {
+                    $('#tigger').remove();
+                }
+                if(states.comingfrom == 'books') {
+                    $('#sprite').css('left', 'auto').css('right', '0');
+                }
+
+                if($('.item').length == 0){
+                    say("Yay, we cleaned up!");
+                    wedidit.play();
+                }
+
+                function arrivedat(id){
+                    var tool = current_tool();
+                    switch(id){
+                        case 'car':
+                            switch(tool){
+                                case 'eye':
+                                    say('CAR');
+                                    car.play();
+                                break;
+                                case 'hand':
+                                    if(add_tool('car')) {
+                                        $('#car').hide();
+                                        states.car='taken';
+                                    }
+                                break;
+                            }
+                        break;
+                        case 'fred':
+                            switch(tool){
+                                case 'eye':
+                                    say('WAKE UP FRED');
+                                    wakeupfred.play();
+                                break;
+                                case 'hand':
+                                    if(add_tool('fred')) {
+                                        $('#fred').hide();
+                                        states.fred='taken';
+                                    }
+                                break;
+                            }
+                        break;
+                        case 'heywakeup':
+                            switch(tool){
+                                case 'eye':
+                                    say('HEY WAKE UP');
+                                    heywakeup.play();
+                                break;
+                                case 'hand':
+                                    if(add_tool('heywakeup')) {
+                                        $('#heywakeup').hide();
+                                        states.heywakeup='taken';
+                                    }
+                                break;
+                            }
+                        break;
+                        case 'key':
+                            switch(tool){
+                                case 'eye':
+                                    say('KEY');
+                                    key.play();
+                                break;
+                                case 'hand':
+                                    if(add_tool('key')) {
+                                        $('#key').hide();
+                                        states.key='taken';
+                                    }
+                                break;
+                            }
+                        break;
+                        case 'monkey':
+                            switch(tool){
+                                case 'eye':
+                                    say('MONKEY');
+                                    monkey.play();
+                                break;
+                                case 'hand':
+                                    if(add_tool('monkey')) {
+                                        $('#monkey').hide();
+                                        states.monkey='taken';
+                                    }
+                                break;
+                            }
+                        break;
+                        case 'rhino':
+                            switch(tool){
+                                case 'eye':
+                                    say('RHINOCEROS BOOK');
+                                    rhino.play();
+                                break;
+                                case 'hand':
+                                    if(add_tool('rhino')) {
+                                        $('#rhino').hide();
+                                        states.rhino='taken';
+                                    }
+                                break;
+                            }
+                        break;
+                        case 'tigger':
+                            switch(tool){
+                                case 'eye':
+                                    say('TIGGER');
+                                    tigger.play();
+                                break;
+                                case 'hand':
+                                    if(add_tool('tigger')) {
+                                        $('#tigger').hide();
+                                        states.tigger='taken';
+                                    }
+                                break;
+                            }
+                        break;
+                        case 'left':
+                            scene('toys');
+                        break;
+                        case 'right':
+                            scene('books');
+                        break;
+                    }
+                }
+            </script>
+        </script>
+        <script id="toys" type="text/html">
+            <div id="toys_foreground"></div>
+            <a id="sprite"></a>
+            <a id="back"></a>
+            <a id="basket1" class='basket'></a>
+            <a id="basket2" class='basket'></a>
+            <a id="basket3" class='basket'></a>
+            <a id="basket4" class='basket'></a>
+            {{>showinventory}}
+            <style>
+                /* TOYS */
+
+                #game {
+                    background: url(img/scenes/toys.jpg) center center;
+                }
+                #toys_foreground {
+                    background: url(img/scenes/toys_foreground.png) center center;
+                    z-index: 3;
+                    height: 100%;
+                    width: 100%;
+                    position: absolute;
+                }
+                #back {
+                    height: 100%;
+                    width: 200px;
+                    left: 0;
+                    z-index: 4;
+                }
+                .basket {
+                    height: 190px;
+                    width: 190px;
+                    top: 120px;
+                    right: 310px;
+                    z-index: 4;
+                }
+                #basket2 {
+                    right: 100px;
+                }
+                #basket3 {
+                    top: 333px;
+                }
+                #basket4 {
+                    right: 100px;
+                    top: 333px;
+                }
+                #sprite {
+                    left: 50%;
+                    bottom: -20px;
+                    height: 161px;
+                    width: 180px;
+                    background: url(img/sitting.png?v=1) 0 0;
+                    -webkit-animation: sitting 3s steps(2) infinite;
+                    z-index: 2;
+                }
+                @-webkit-keyframes sitting {
+                   from { background-position:    0 0px; }
+                     to { background-position: 0 -322px; }
+                }
+                #sprite.walking {
+                    background-image: url(img/walking.png);
+                    height: 134px;
+                    -webkit-animation: walking .8s steps(2) infinite;
+                }
+                @-webkit-keyframes walking {
+                   from { background-position:    0 0px; }
+                     to { background-position:  0 -268px; }
+                }
+            </style>
+            <script>
+                //TOYS
+
+                //ready the room with any necessary states
+                
+
+                function arrivedat(id){
+                    var tool = current_tool();
+                    switch(id){
+                        case 'back':
+                            states.comingfrom = 'toys';
+                            scene('floor');
+                        break;
+                        case 'basket1':
+                        case 'basket3':
+                        case 'basket4':
+                            switch(tool){
+                                case 'hand':
+                                    say('We should be cleaning up, not finding more toys to play with!');
+                                    shouldbecleaning.play();
+                                break;
+                                default:
+                                    say('That spot is already full of toys.');
+                                    full.play();
+                                break;
+                            }
+                        break;
+                        case 'basket2':
+                            switch(tool){
+                                case 'eye':
+                                case 'hand':
+                                    say("There's an empty toy basket!");
+                                    empty.play();
+                                break;
+                                case 'car':
+                                case 'key':
+                                case 'monkey':
+                                case 'tigger':
+                                    lose_tool(tool);
+                                    say("I put that toy away!");
+                                    away.play();
+                                break;
+                                case 'fred':
+                                case 'heywakeup':
+                                case 'rhino':
+                                    say("Waitaminute... That's a book, not a toy! It goes on the bookshelf.");
+                                    notatoy.play();
+                                break;
+                            }
+                        break;
+                    }
+                }
+            </script>
+        </script>
+        <script id="books" type="text/html">
+            <a id="sprite"></a>
+            <a id="back"></a>
+            <a id="bookshelf"></a>
+            {{>showinventory}}
+            <style>
+                /* BOOKS */
+
+                #game {
+                    background: url(img/scenes/books.jpg) center center;
+                }
+                #back {
+                    height: 100%;
+                    width: 200px;
+                    right: 0;
+                    z-index: 4;
+                }
+                #bookshelf {
+                    left: 40px;
+                    top: 10px;
+                    height: 370px;
+                    width: 400px;
+                }
+                #sprite {
+                    right: 20px;
+                    bottom: 20px;
+                    height: 161px;
+                    width: 180px;
+                    background: url(img/sitting.png?v=1) 0 0;
+                    -webkit-animation: sitting 3s steps(2) infinite;
+                    z-index: 2;
+                }
+                @-webkit-keyframes sitting {
+                   from { background-position:    0 0px; }
+                     to { background-position: 0 -322px; }
+                }
+                #sprite.walking {
+                    background-image: url(img/walking.png);
+                    height: 134px;
+                    -webkit-animation: walking .8s steps(2) infinite;
+                }
+                @-webkit-keyframes walking {
+                   from { background-position:    0 0px; }
+                     to { background-position:  0 -268px; }
+                }
+            </style>
+            <script>
+                //BOOKS
+
+                //ready the room with any necessary states
+                
+
+                function arrivedat(id){
+                    var tool = current_tool();
+                    switch(id){
+                        case 'back':
+                            states.comingfrom = 'books';
+                            scene('floor');
+                        break;
+                        case 'bookshelf':
+                            switch(tool){
+                                case 'eye':
+                                case 'hand':
+                                    say("It's the bookshelf!");
+                                break;
+                                case 'car':
+                                case 'key':
+                                case 'monkey':
+                                case 'tigger':
+                                    say("That's not a book...");
+                                    notabook.play();
+                                break;
+                                case 'fred':
+                                case 'heywakeup':
+                                case 'rhino':
+                                    lose_tool(tool);
+                                    say("I put the book away!");
+                                    wedidit.play();
+                                break;
+                            }
+                        break;
+                    }
+                }
+            </script>
+        </script>
+        <script id="template" type="text/html">
+            <a id="sprite"></a>
+            {{>showinventory}}
+            <style>
+                #game {
+                    background: url(img/scenes/.png) center center;
+                }
+                #sprite {
+                    left: 20px;
+                    bottom: 128px;
+                    height: 200px;
+                    width: 52px;
+                    background: url(img/sprite.png) 0 0;
+                    -webkit-animation: standing 12s steps(2) infinite;
+                }
+                @-webkit-keyframes standing {
+                   from { background-position:    0 0px; }
+                     to { background-position: 0 -400px; }
+                }
+                #sprite.walking {
+                    background-image: url(img/walking.png);
+                    width: 60px;
+                    -webkit-animation: walking .8s steps(5) infinite;
+                }
+                @-webkit-keyframes walking {
+                   from { background-position:    0 0px; }
+                     to { background-position:  0 -1000px; }
+                }
+            </style>
+            <script>
+                //ready the room with any necessary states
+
+
+                function arrivedat(id){
+                    var tool = current_tool();
+                    switch(id){
+
+                    }
+                }
+            </script>
+        </script>
+    </head>
+    <body>
+        <!--[if lt IE 8]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <!-- Add your site or application content here -->
+        <div id='game'>
+            <div id='scene'></div>
+            <div id='text'></div>
+            <div id='inventory'>
+                <div data-tool='eye' class='has active'><a class='target'></a></div>
+                <div data-tool='hand' class='has'><a class='target'></a></div>
+                <div><a class='target'></a></div>
+                <div><a class='target'></a></div>
+                <style>
+                    a {
+                        cursor: url(img/eye.png), pointer;
+                    }
+                    #inventory [data-tool=eye]{
+                        background-image: url(img/eye.png);
+                    }
+                    #inventory [data-tool=hand]{
+                        background-image: url(img/hand.png);
+                    }
+                    #inventory [data-tool=rock]{
+                        background-image: url(img/rock_icon.png);
+                    }
+                    #inventory [data-tool=stick]{
+                        background-image: url(img/stick_icon.png);
+                    }
+                    #inventory [data-tool=jerrycan]{
+                        background-image: url(img/jerrycan_icon.png);
+                    }
+                </style>
+            </div>
+        </div>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+        <script>
+            jQuery(document).ready(function($){
+                $('.target').on('click', function(e){
+                    var targeted = $(this).parent().attr('data-tool');
+                    var tool = current_tool();
+                    switch(targeted){
+                        case 'eye':
+
+                        break;
+                        case 'hand':
+                            switch(tool){
+                                case 'eye':
+                                    
+                                break;
+                            }
+                        break;
+                        case 'monkey':
+                            switch(tool){
+                                case 'eye':
+                                    say("It's a monkey!");
+                                    monkey.play();
+                                break;
+                            }
+                        break;
+                        case 'car':
+                            switch(tool){
+                                case 'eye':
+                                    say("It's a car!");
+                                    car.play();
+                                break;
+                            }
+                        break;
+                        case 'heywakeup':
+                            switch(tool){
+                                case 'eye':
+                                    say("It's a book called Hey, Wake Up!");
+                                    heywakeup.play();
+                                break;
+                            }
+                        break;
+                        case 'key':
+                            switch(tool){
+                                case 'eye':
+                                    say("It's a key!");
+                                    key.play();
+                                break;
+                            }
+                        break;
+                        case 'rhino':
+                            switch(tool){
+                                case 'eye':
+                                    say("It's a rhinoceros book!");
+                                    rhino.play();
+                                break;
+                            }
+                        break;
+                        case 'tigger':
+                            switch(tool){
+                                case 'eye':
+                                    say("It's tigger!");
+                                    tigger.play();
+                                break;
+                            }
+                        break;
+                    }
+                    e.preventdefault();
+                    return false;
+                });
+            });
+        </script>
+        <audio id="audioTitle" preload="auto"><source src="audio/Title.mp3" type='audio/mp3; codecs="mp3"' /></audio>
+        <div id='preload'>
+            <!--img src='img/parachute.png' /-->
+            <img src='img/scenes/books.png' />
+            <img src='img/scenes/floor.png' />
+            <img src='img/scenes/toys.png' />
+            <img src='img/car.png' />
+            <img src='img/car_icon.png' />
+            <img src='img/eye.png' />
+            <img src='img/fred.png' />
+            <img src='img/fred_icon.png' />
+            <img src='img/hand.png' />
+            <img src='img/heywakeup.png' />
+            <img src='img/heywakeup_icon.png' />
+            <img src='img/key.png' />
+            <img src='img/key_icon.png' />
+            <img src='img/monkey.png' />
+            <img src='img/monkey_icon.png' />
+            <img src='img/rhino.png' />
+            <img src='img/rhino_icon.png' />
+            <img src='img/sitting.png' />
+            <img src='img/tigger.png' />
+            <img src='img/tigger_icon.png' />
+            <img src='img/walking.png' />
+        </div>
+
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.0.min.js"><\/script>')</script>
+        <script src="js/plugins.js"></script>
+        <script src="js/main.js"></script>
+
+        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+        <script>
+            (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+            function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+            e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+            e.src='//www.google-analytics.com/analytics.js';
+            r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+            ga('create','UA-XXXXX-X');ga('send','pageview');
+        </script>
+    </body>
+</html>
